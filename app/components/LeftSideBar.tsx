@@ -7,10 +7,28 @@ import { FaRegUser, FaXTwitter } from "react-icons/fa6";
 import { GoHomeFill } from "react-icons/go";
 import { IoSearchOutline } from "react-icons/io5";
 import { TbDotsCircleHorizontal } from "react-icons/tb";
-import Image from "next/image";
 import { HiDotsCircleHorizontal } from "react-icons/hi";
+import { prisma } from "@/prisma";
+import { auth } from "@clerk/nextjs/server";
 
-export default function LeftSideBar() {
+export default async function LeftSideBar() {
+
+
+ const { userId } = await auth();
+  if (!userId) return null;
+
+  // 🔥 Fetch user's profile from Prisma
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      username: true,
+      displayName: true,
+      img: true,
+    },
+  });
+
+  if (!user) return null;
+
   return (
     <aside className="fixed left-0 top-0 w-[50px] lg:w-[400px] p-1 lg:p-4 h-screen lg:pl-30">
       <p className="mb-6 text-white">
@@ -19,7 +37,7 @@ export default function LeftSideBar() {
 
       <div className="space-y-2">
         <Link
-          href="#"
+          href="/home"
           className="text-white flex items-center lg:gap-3 p-3 rounded-full hover:bg-hover"
         >
           <GoHomeFill size={30} />
@@ -79,7 +97,7 @@ export default function LeftSideBar() {
 
       <div className="space-y-2">
         <Link
-          href="#"
+          href={`/${user.username}`}
           className="text-white flex items-center lg:gap-3 p-3 rounded-full hover:bg-hover"
         >
           <FaRegUser size={30} />
@@ -106,19 +124,19 @@ export default function LeftSideBar() {
       </button>
 
       <div className="mt-10 text-white flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Image
-            src="/profilep.jpg"
+        {/* <div className="flex items-center gap-2">
+          <Imagekitt
+            path="me.jpg"
             alt="profilepic"
-            width={500}
-            height={500}
+            w={500}
+            h={500}
             className="w-10 h-10 object-cover rounded-full"
           />
           <div className="hidden lg:block">
             <p className="font-semibold">Krmzxax</p>
             <p className="text-secondary-text font-light">@zxaxkrm</p>
           </div>
-        </div>
+        </div> */}
 
         <HiDotsCircleHorizontal className="hidden lg:block "/>
       </div>

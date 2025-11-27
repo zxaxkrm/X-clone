@@ -1,19 +1,21 @@
 "use client";
-import React, { useRef, useState } from "react";
+
+import React, { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { TbPhoto } from "react-icons/tb";
 import { FaRegSmile } from "react-icons/fa";
-import { IoLocateOutline, IoLocationOutline } from "react-icons/io5";
+import { IoLocationOutline } from "react-icons/io5";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { RxCross2 } from "react-icons/rx";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
+import Imagekitt from "./IKImage";
+import { addPost } from "@/action";
 
-export default function CreatePost() {
+const CreatePost = ({ dbUser }: { dbUser: { img: string | null } | null }) => {
   const [postB, SetPostB] = useState("");
   const [picturePrev, SetPicturePrev] = useState<string | null>(null);
   const [showPicker, SetShowpicker] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const isDisabled = postB.trim() === "" && !picturePrev;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,44 +29,63 @@ export default function CreatePost() {
     if (fileRef.current) fileRef.current.value = "";
   };
 
-const clickEmoji = (emojidata: EmojiClickData) =>{
-    SetPostB((prev)=>prev + emojidata.emoji)
-}
+  const clickEmoji = (emojidata: EmojiClickData) => {
+    SetPostB((prev) => prev + emojidata.emoji);
+  };
+
+  // useActionState for server action
+  const [state, formAction, isPending] = useActionState(addPost, {
+    success: false,
+    error: false,
+  });
+
+  useEffect(() => {
+    if (state.success) {
+      SetPostB("");
+      SetPicturePrev(null);
+      if (fileRef.current) fileRef.current.value = "";
+      SetShowpicker(false);
+    }
+  }, [state.success]);
 
   return (
-    <div>
-      <div className=" p-3 border border-border">
+    <form action={formAction}>
+      <div className="p-3 border border-border">
         <div className="flex gap-4">
-          <Image
-            src={"/me.jpg"}
-            alt="dpp"
-            width={500}
-            height={500}
+          
+          <Imagekitt
+            path={dbUser?.img || "general/avatar.jpeg"}
+            alt="dp"
+            w={500}
+            h={500}
             className="w-15 h-15 rounded-full object-cover"
           />
 
           <div className="w-full">
-            <textarea
+            <input
               placeholder="What's happening?"
-              className="w-full placeholder:text-secondary-text outline-none text-white text-xl resize-none"
+              name="desc"
+              className="w-full placeholder:text-secondary-text outline-none text-white text-lg resize-none"
               value={postB}
               onChange={(e) => SetPostB(e.target.value)}
-            ></textarea>
+            />
           </div>
         </div>
 
+        
         {picturePrev && (
           <div className="h-60 md:h-100 mt-1 rounded-lg overflow-hidden border border-border mb-10 relative">
             <Image
               src={picturePrev}
-              alt="painn"
+              alt="preview"
               width={800}
               height={800}
-              className="h-full w--full object-cover"
+              className="h-full w-full object-cover"
             />
 
             <button
               onClick={removePicture}
+              type="button"
               className="grid items-center justify-center absolute top-5 right-5 bg-gray-600 w-10 h-10 text-2xl rounded-full opacity-50 cursor-pointer"
             >
               <RxCross2 />
@@ -73,7 +94,7 @@ const clickEmoji = (emojidata: EmojiClickData) =>{
         )}
 
         <div className="flex justify-between py-4 items-center border-t border-border ml-4 mt-3">
-          <div className="flex gap-3 ">
+          <div className="flex gap-3">
             <div
               className="text-primary cursor-pointer"
               onClick={() => fileRef.current?.click()}
@@ -97,14 +118,16 @@ const clickEmoji = (emojidata: EmojiClickData) =>{
             </div>
           </div>
 
-          {isDisabled ? (
-            <button className="text-black bg-secondary-text py-2 px-5 text-lg font-semibold rounded-full cursor-pointer">
-              Post
-            </button>
-          ) : (
-            <button className="text-black bg-white py-2 px-5 text-lg font-semibold rounded-full cursor-pointer">
-              Post
-            </button>
+          <button
+            disabled={isPending}
+            type="submit"
+            className="text-black bg-white py-2 px-5 text-lg font-semibold rounded-full cursor-pointer disabled:cursor-not-allowed"
+          >
+            {isPending ? "Posting" : "Post"}
+          </button>
+
+          {state.error && (
+            <span className="text-red-300 p-4">Something went wrong!</span>
           )}
 
           {showPicker && (
@@ -124,10 +147,13 @@ const clickEmoji = (emojidata: EmojiClickData) =>{
         <input
           type="file"
           ref={fileRef}
+          name="file"
           className="hidden"
           onChange={handleFileChange}
         />
       </div>
-    </div>
+    </form>
   );
-}
+};
+
+export default CreatePost;
