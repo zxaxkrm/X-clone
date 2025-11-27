@@ -47,7 +47,6 @@ export default function Imagekitt({
       width={w}
       height={h}
       alt={alt}
-      transformation={[{width:`${w}` , height:`${h}`}]}
       className={className}
     />
   );
