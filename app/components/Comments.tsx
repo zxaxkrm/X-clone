@@ -14,11 +14,14 @@ import Post from "./Post";
 import { Post as PostType } from "@prisma/client";
 
 type CommentsWithDetails = PostType & {
-  user: { displayname: string | null; username: string; img: string | null };
+  user: { displayName: string | null; username: string; img: string | null };
   _count: { likes: number; reposts: number; comments: number };
   likes: { id: number }[];
   reposts: { id: number }[];
-  saves: { id: number }[];
+  Saved: { id: number }[];
+  repost: null;
+  
+  
 };
 
 const Comments = ({

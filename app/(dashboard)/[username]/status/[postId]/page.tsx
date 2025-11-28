@@ -16,26 +16,118 @@ const PostPage = async ({
 
   if (!userId) return;
 
+  // const post = await prisma.post.findFirst({
+  //   where: { id: Number(postId) },
+  //   include: {
+  //     user: { select: { displayName: true, username: true, img: true } },
+  //     _count: { select: { likes: true, reposts: true, comments: true } },
+  //     likes: { where: { userId: userId }, select: { id: true } },
+  //     reposts: { where: { userId: userId }, select: { id: true } },
+  //     Saved: { where: { userId: userId }, select: { id: true } },
+  //     comments: {
+  //       orderBy:{createdAt: "desc"},
+  //       include: {
+  //         user: { select: { displayName: true, username: true, img: true } },
+  //         _count: { select: { likes: true, reposts: true, comments: true } },
+  //         likes: { where: { userId: userId }, select: { id: true } },
+  //         reposts: { where: { userId: userId }, select: { id: true } },
+  //         Saved: { where: { userId: userId }, select: { id: true } },
+  //       },
+  //     },
+  //   },
+  // });
+
   const post = await prisma.post.findFirst({
-    where: { id: Number(postId) },
-    include: {
-      user: { select: { displayName: true, username: true, img: true } },
-      _count: { select: { likes: true, reposts: true, comments: true } },
-      likes: { where: { userId: userId }, select: { id: true } },
-      reposts: { where: { userId: userId }, select: { id: true } },
-      Saved: { where: { userId: userId }, select: { id: true } },
-      comments: {
-        orderBy:{createdAt: "desc"},
-        include: {
-          user: { select: { displayName: true, username: true, img: true } },
-          _count: { select: { likes: true, reposts: true, comments: true } },
-          likes: { where: { userId: userId }, select: { id: true } },
-          reposts: { where: { userId: userId }, select: { id: true } },
-          Saved: { where: { userId: userId }, select: { id: true } },
+  where: { id: Number(postId) },
+  include: {
+    user: { 
+      select: { displayName: true, username: true, img: true } 
+    },
+
+    repost: {
+      include: {
+        user: {
+          select: {
+            displayName: true,
+            username: true,
+            img: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            reposts: true,
+            comments: true,
+          },
+        },
+        likes: {
+          where: { userId },
+          select: { id: true },
+        },
+        reposts: {
+          where: { userId },
+          select: { id: true },
+        },
+        Saved: {
+          where: { userId },
+          select: { id: true },
         },
       },
     },
-  });
+
+    _count: { 
+      select: { likes: true, reposts: true, comments: true } 
+    },
+
+    likes: { 
+      where: { userId }, 
+      select: { id: true } 
+    },
+
+    reposts: { 
+      where: { userId }, 
+      select: { id: true } 
+    },
+
+    Saved: { 
+      where: { userId }, 
+      select: { id: true } 
+    },
+
+    comments: {
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            displayName: true,
+            username: true,
+            img: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            reposts: true,
+            comments: true,
+          },
+        },
+        likes: {
+          where: { userId },
+          select: { id: true },
+        },
+        reposts: {
+          where: { userId },
+          select: { id: true },
+        },
+        Saved: {
+          where: { userId },
+          select: { id: true },
+        },
+      },
+    },
+  },
+});
+
 
   if (!post) return notFound();
 
@@ -57,7 +149,7 @@ const PostPage = async ({
         <Post type="status" post={post} />
         {/* <ReplyPost /> */}
         <Comments
-          comments={post.comments}
+          comments={post.comments.map(c => ({ ...c, repost: null }))}
           postId={post.id}
           username={post.user.username}
         />
