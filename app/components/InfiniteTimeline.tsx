@@ -41,7 +41,7 @@ const InfiniteTimeline = ({ userProfileId }: { userProfileId?: string }) => {
       next={fetchNextPage}
       hasMore={!!hasNextPage}
       loader={<h1 className="text-white">Posts are loading..</h1>}
-      endMessage={<h1 className="text-white text-sm">All posts loaded!</h1>}
+      endMessage={<h1 className="text-white text-sm">All posts loaded! <br />Follow users to see more posts.</h1>}
     >
         {allPosts.map(post=>(<Post key={post.id} post={post}/>))}
         
