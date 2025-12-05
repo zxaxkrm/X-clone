@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // Create new Svix instance with secret
+  
   const wh = new Webhook(SIGNING_SECRET);
 
   
@@ -21,20 +21,20 @@ export async function POST(req: Request) {
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
 
-  // If there are no headers, error out
+  
   if (!svix_id || !svix_timestamp || !svix_signature) {
     return new Response("Error: Missing Svix headers", {
       status: 400,
     });
   }
 
-  // Get body
+  
   const payload = await req.json();
   const body = JSON.stringify(payload);
 
   let evt: WebhookEvent;
 
-  // Verify payload with headers
+  
   try {
     evt = wh.verify(body, {
       "svix-id": svix_id,
@@ -48,8 +48,7 @@ export async function POST(req: Request) {
     });
   }
 
-  // Do something with payload
-  // For this guide, log payload to console
+  
   const { id } = evt.data;
   const eventType = evt.type;
   console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
@@ -65,7 +64,7 @@ export async function POST(req: Request) {
           // img: JSON.parse(body).image_url || "" 
         },
       });
-      // return new Response("User created", { status: 200 });
+      
     } catch (err) {
       console.log(err);
       return new Response("Error: Failed to create a user!", {

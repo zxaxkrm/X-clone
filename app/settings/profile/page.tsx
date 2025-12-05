@@ -8,7 +8,7 @@ import BackButton from "@/app/components/BackButton";
 const EditProfilePage = () => {
   const router = useRouter();
 
-  // State
+  
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
@@ -16,7 +16,7 @@ const EditProfilePage = () => {
   const [img, setImg] = useState("");
   const [cover, setCover] = useState("");
 
-  // Load user from Prisma
+  
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -39,7 +39,7 @@ const EditProfilePage = () => {
     loadUser();
   }, []);
 
-  // ImageKit upload
+  
   const uploadToImageKit = async (file: File) => {
     const sigRes = await fetch("/api/imagekit/signature");
     const { url, token, expire, signature, publicKey } = await sigRes.json();
@@ -59,7 +59,7 @@ const EditProfilePage = () => {
     return data.url;
   };
 
-  // Save handler
+  
   const handleSave = async () => {
     const res = await fetch("/api/user/update", {
       method: "POST",
@@ -79,7 +79,7 @@ const EditProfilePage = () => {
       return;
     }
 
-    // Fetch updated user to get correct username
+    
     const me = await (await fetch("/api/user/me")).json();
     router.push(`/${me.username}`);
   };
@@ -104,7 +104,7 @@ const EditProfilePage = () => {
 
       </div>
         
-        {/* COVER UPLOAD */}
+        
         <div className="relative w-full h-40 bg-gray-800 rounded-lg overflow-hidden">
           {cover && (
             <Image src={cover} fill alt="Cover" className="object-cover" />
@@ -125,7 +125,7 @@ const EditProfilePage = () => {
           </label>
         </div>
 
-        {/* PROFILE IMAGE UPLOAD */}
+        
         <div className="flex justify-center">
           <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-black -mt-14">
             {img ? (
@@ -150,7 +150,7 @@ const EditProfilePage = () => {
           </div>
         </div>
 
-        {/* TEXT FIELDS */}
+        
         <div className="space-y-4">
           <div>
             <label className="block mb-1">Display Name</label>

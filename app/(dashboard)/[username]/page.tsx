@@ -17,7 +17,7 @@ const UserPage = async ({
 }: {
   params: { username: string } | Promise<{ username: string }>;
 }) => {
-  // If params is a promise, await it
+ 
   const { username } = await params;
 
   const { userId } = await auth();

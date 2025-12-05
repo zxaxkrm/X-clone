@@ -17,7 +17,7 @@ export default async function LeftSideBar() {
  const { userId } = await auth();
   if (!userId) return null;
 
-  // 🔥 Fetch user's profile from Prisma
+  
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
